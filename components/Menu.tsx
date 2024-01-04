@@ -8,7 +8,6 @@ import ItemsCard from './ItemCard';
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState('metamask'); // default to MetaMask
-  const [itemCards, setItemCards] = useState([]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
