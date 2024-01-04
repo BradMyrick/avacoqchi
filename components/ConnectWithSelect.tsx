@@ -1,9 +1,6 @@
 import type { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import type { Web3ReactHooks } from '@web3-react/core'
-import { GnosisSafe } from '@web3-react/gnosis-safe'
-import type { MetaMask } from '@web3-react/metamask'
-import { Network } from '@web3-react/network'
-import { WalletConnect } from '@web3-react/walletconnect'
+import { MetaMask } from '@web3-react/metamask'
 import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -29,7 +26,7 @@ function ChainSelect({
       <option hidden disabled>
         Select chain
       </option>
-      <option value={-1}>Default</option>
+      <option value={43114}>Avalanche Mainnet</option>
       {chainIds.map((chainId) => (
         <option key={chainId} value={chainId}>
           {CHAINS[chainId]?.name ?? chainId}
@@ -48,7 +45,7 @@ export function ConnectWithSelect({
   error,
   setError,
 }: {
-  connector: MetaMask | WalletConnect | WalletConnectV2 | CoinbaseWallet | Network | GnosisSafe
+  connector: MetaMask | WalletConnectV2 | CoinbaseWallet
   activeChainId: ReturnType<Web3ReactHooks['useChainId']>
   chainIds?: ReturnType<Web3ReactHooks['useChainId']>[]
   isActivating: ReturnType<Web3ReactHooks['useIsActivating']>
@@ -71,7 +68,6 @@ export function ConnectWithSelect({
   const switchChain = useCallback(
     async (desiredChainId: number) => {
       setDesiredChainId(desiredChainId)
-
       try {
         if (
           // If we're already connected to the desired chain, return
@@ -83,12 +79,10 @@ export function ConnectWithSelect({
           return
         }
 
-        if (desiredChainId === -1 || connector instanceof GnosisSafe) {
+        if (desiredChainId === -1) {
           await connector.activate()
         } else if (
-          connector instanceof WalletConnectV2 ||
-          connector instanceof WalletConnect ||
-          connector instanceof Network
+          connector instanceof WalletConnectV2
         ) {
           await connector.activate(desiredChainId)
         } else {
@@ -105,9 +99,7 @@ export function ConnectWithSelect({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {!(connector instanceof GnosisSafe) && (
-        <ChainSelect activeChainId={desiredChainId} switchChain={switchChain} chainIds={chainIds} />
-      )}
+       <ChainSelect activeChainId={desiredChainId} switchChain={switchChain} chainIds={chainIds} />
       <div style={{ marginBottom: '1rem' }} />
       {isActive ? (
         error ? (
@@ -129,12 +121,14 @@ export function ConnectWithSelect({
       ) : (
         <button
           onClick={() =>
-            connector instanceof GnosisSafe
-              ? void connector
-                  .activate()
-                  .then(() => setError(undefined))
-                  .catch(setError)
-              : switchChain(desiredChainId)
+            switchChain(
+              desiredChainId === -1
+                ? undefined
+                : desiredChainId === activeChainId
+                ? activeChainId
+                : desiredChainId
+            )
+            // wallet_addEthereumChain must be called after selecting the chain in MetaMask
           }
           disabled={isActivating || !desiredChainId}
         >

@@ -1,6 +1,5 @@
 import CoinbaseWalletCard from '../components/connectorCards/CoinbaseWalletCard'
 import MetaMaskCard from '../components/connectorCards/MetaMaskCard'
-import NetworkCard from '../components/connectorCards/NetworkCard'
 import WalletConnectV2Card from '../components/connectorCards/WalletConnectV2Card'
 import Provider from '../components/Provider'
 
@@ -12,7 +11,6 @@ export default function Home() {
         <MetaMaskCard />
         <WalletConnectV2Card />
         <CoinbaseWalletCard />
-        <NetworkCard />
       </div>
     </>
   )
