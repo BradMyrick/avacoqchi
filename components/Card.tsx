@@ -52,26 +52,6 @@ export function Card({
         error={error}
         setError={setError}
       />
-
-      <style jsx>{`
-        .card {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 1rem;
-          margin-bottom: 1rem;
-          background: #fff;
-          border: 1px solid #eaeaea;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          border-radius: 10px;
-        }
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1rem;
-        }
-      `}</style>
     </div>
   );
 }

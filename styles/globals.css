@@ -1,0 +1,157 @@
+/* styles.css */
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-25px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}
+
+/* General Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Orbitron', sans-serif;
+  background-color: #9bff74; 
+  color: #c5c6c7; 
+}
+
+/* Hamburger Menu Styles */
+.hamburger-button {
+  position: fixed; /* TODO: make button stay with menu when it opens */
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  cursor: pointer;
+  font-size: 24px;
+  background: none;
+  border: none;
+  color: #662500;
+}
+
+.menu-container {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  height: 100%;
+  background: #ffd079;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  transition: right 0.3s ease;
+  z-index: 90;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-container.open {
+  right: 0;
+  animation: bounce 0.6s ease;
+}
+
+/* Wallet Card Styles */
+.card {
+  background: #c0550d;
+  border: 1px solid #662500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Slight lift effect on hover */
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Wallet Selector Styles */
+.wallet-selector {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.wallet-selector button {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: #dac2c2;
+  color: #000000;
+  border: 2px solid #662500;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.wallet-selector button:hover {
+  background: #1f2833; /* Darker background on hover */
+}
+
+/* Status Indicator Styles */
+.status-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator .status-dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-indicator .status-dot.connected {
+  background-color: #66fc66; /* Bright color for connected status */
+}
+
+.status-indicator .status-dot.disconnected {
+  background-color: #3b0905; /* Red color for disconnected status */
+}
+
+.status-indicator .status-dot.error {
+  background-color: #ff9800; /* Orange color for error status */
+}
+
+/* Items Card and Inventory */
+.inventory {
+  background: #c0550d; 
+  color: #c5c6c7; 
+  border: 1px solid #662500;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+}
+
+.items-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  color: #c5c6c7;
+  padding: 1rem;
+  margin-bottom: 0.1rem;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.items-card:hover, .inventory:hover {
+  transform: translateY(-5px); /* Consistent lift effect on hover */
+}
+
