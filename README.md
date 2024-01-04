@@ -46,7 +46,7 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Roadmap
 
-See the [open issues](https://github.com/BradMyrick/AvaCoqChi/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/BradMyrick/avacoqchi/issues) for a list of proposed features (and known issues).
 
 ## Contributing
 
@@ -64,9 +64,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-- Twitter: [@BradMyrickDev](https://twitter.com/kodr_eth)
+- Twitter: [@Kodr_eth](https://twitter.com/kodr_eth)
 - Discord: .kodr
-- Telegram: [@BradMyrickAI](https://t.me/@Kodr_eth)
+- Telegram: [@kodr_eth](https://t.me/@Kodr_eth)
 
 Project Link: [https://github.com/BradMyrick/AvaCoqChi](https://github.com/BradMyrick/avacoqchi)
 
