@@ -1,3 +1,4 @@
+// ConnectWithSelect.tsx
 import type { CoinbaseWallet } from '@web3-react/coinbase-wallet'
 import type { Web3ReactHooks } from '@web3-react/core'
 import { MetaMask } from '@web3-react/metamask'
@@ -5,7 +6,7 @@ import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import { useCallback, useEffect, useState } from 'react'
 
 import { CHAINS, getAddChainParameters } from '../chains'
-
+const defaultChain = 43114
 function ChainSelect({
   activeChainId,
   switchChain,
@@ -26,7 +27,7 @@ function ChainSelect({
       <option hidden disabled>
         Select chain
       </option>
-      <option value={43114}>Avalanche Mainnet</option>
+      <option value={defaultChain}>Auto Connect</option>
       {chainIds.map((chainId) => (
         <option key={chainId} value={chainId}>
           {CHAINS[chainId]?.name ?? chainId}
@@ -79,7 +80,7 @@ export function ConnectWithSelect({
           return
         }
 
-        if (desiredChainId === -1) {
+        if (desiredChainId === defaultChain) {
           await connector.activate()
         } else if (
           connector instanceof WalletConnectV2
@@ -122,13 +123,12 @@ export function ConnectWithSelect({
         <button
           onClick={() =>
             switchChain(
-              desiredChainId === -1
+              desiredChainId === defaultChain
                 ? undefined
                 : desiredChainId === activeChainId
                 ? activeChainId
                 : desiredChainId
             )
-            // wallet_addEthereumChain must be called after selecting the chain in MetaMask
           }
           disabled={isActivating || !desiredChainId}
         >

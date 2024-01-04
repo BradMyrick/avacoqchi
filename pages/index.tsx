@@ -1,17 +1,14 @@
-import CoinbaseWalletCard from '../components/connectorCards/CoinbaseWalletCard'
-import MetaMaskCard from '../components/connectorCards/MetaMaskCard'
-import WalletConnectV2Card from '../components/connectorCards/WalletConnectV2Card'
-import Provider from '../components/Provider'
+// index.tsx
+import React from 'react';
+import Menu from '../components/Menu';
 
-export default function Home() {
+const IndexPage = () => {
   return (
-    <>
-      <Provider />
-      <div style={{ display: 'flex', flexFlow: 'wrap', fontFamily: 'sans-serif' }}>
-        <MetaMaskCard />
-        <WalletConnectV2Card />
-        <CoinbaseWalletCard />
-      </div>
-    </>
-  )
-}
+    <div>
+      <Menu />
+      {}
+    </div>
+  );
+};
+
+export default IndexPage;
