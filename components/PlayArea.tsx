@@ -34,32 +34,6 @@ const PlayArea = () => {
     return (
         <div className="play-area">
             <Gameplay/>
-            {isEgg ? (
-                // If the chicken is still an egg, show the naming interface
-                <div className="naming-interface">
-                    <div className="chicken-image">🐣</div>
-                    <input
-                        type="text"
-                        placeholder="Name your chicken"
-                        value={chickenName}
-                        onChange={(e) => setChickenName(e.target.value)}
-                    />
-                    <button onClick={() => setIsEgg(false)}>Start Game</button>
-                </div>
-            ) : (
-                // If the chicken has hatched, show the chicken and its care interface
-                <div className="chicken-container">
-                    <div className="chicken">
-                        <div className="chicken-image">🐔</div>                    
-                    </div>
-                    <div className="chicken-status">
-                        <p>Name: {chicken.name}</p>
-                        <p>Health: {chicken.health}</p>
-                        <p>Happiness: {chicken.happiness}</p>
-                    </div>
-                    {/* The chicken interactions are now handled by the Gameplay component */}
-                </div>
-            )}
         </div>
     );
 }

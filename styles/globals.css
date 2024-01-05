@@ -206,3 +206,20 @@ body {
   font-size: 10rem;
   animation: bounce 0.6s ease;
 }
+
+.gameplay-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* 3x3 Grid */
+.controller-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  
+}
