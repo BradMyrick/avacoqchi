@@ -10,6 +10,7 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
     IERC20 public coqToken;
     uint256 public eggPrice;
     uint256 private _tokenIds;
+    uint256 public NextTokenId;
 
     // Constants for item types
     uint256 public constant ITEM_FEED = 0;
@@ -30,8 +31,17 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
     // Mapping from token ID to item count for items
     mapping(uint256 => uint256) public items;
 
+    // Mapping of item ID to item type
+    mapping(uint256 => uint256) public itemTypes;
+
     // Mapping of item ID to coq cost
     mapping(uint256 => uint256) public itemCosts;
+
+    // Mapping of item ID to healing amount
+    mapping(uint256 => uint256) public itemHealing;
+
+    // Mapping of item ID to item name
+    mapping (uint256 => string) private itemNames;
 
     event EggPurchased(address indexed buyer, uint256 tokenId);
     event EggHatched(address indexed owner, uint256 tokenId);
@@ -41,8 +51,28 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
     event ChickenFed(address indexed owner, uint256 tokenId, uint256 amount);
     event ChickenWatered(address indexed owner, uint256 tokenId, uint256 amount);
     event ChickenMedicated(address indexed owner, uint256 tokenId, uint256 amount);
+    event ItemCreated(address indexed _owner, uint256 _itemId, uint256 _cost, uint256 _healing, uint256 _type, string _name);
 
     constructor(address _coqTokenAddress, uint256 _eggPrice) ERC1155("https://avacoqchi/metadata/") Ownable(msg.sender){
+        // setup initial item costs
+        // healing
+        itemTypes[1] = ITEM_MEDICINE;
+        itemHealing[1] = 80;
+        itemCosts[1] = 1000 ether;
+        itemNames[1] = "Elixir of Life";
+        // feed
+        itemTypes[2] = ITEM_FEED;
+        itemHealing[2] = 10;
+        itemCosts[2] = 100 ether;
+        itemNames[2] = "Chicken Feed";
+        // water
+        itemTypes[3] = ITEM_WATER;
+        itemHealing[3] = 10;
+        itemCosts[3] = 100 ether;
+        itemNames[3] = "Chicken Water";
+
+        NextTokenId = 4;
+        
         coqToken = IERC20(_coqTokenAddress);
         eggPrice = _eggPrice;
     }
@@ -98,8 +128,14 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
         _unpause();
     }
 
-    function setItemCost(uint256 itemId, uint256 cost) external onlyOwner {
-        itemCosts[itemId] = cost;
+    function createItem(uint256 _cost, uint256 _healing, uint256 _type, string calldata _name) external onlyOwner {
+        _itemId = NextTokenId;
+        itemNames[_itemId] = _name;
+        itemHealing[_itemId] = _healing;
+        itemCosts[_itemId] = _cost;
+        itemTypes[_itemId] = _type;
+        emit ItemCreated(msg.sender, _itemId, _cost, _healing, _type, _name);
+        NextTokenId++;
     }
 
     // two week hackathon, no need to make it too complicated
@@ -133,29 +169,33 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
     // GAME MECHANICS
 
     // feed chicken
-    function feedChicken(uint256 tokenId, uint256 amount) external whenNotPaused {
+    function feedChicken(uint256 tokenId, uint256 itemId, uint256 amount) external whenNotPaused {
         require(chickens[tokenId].isHatched == true, "Chicken not hatched");
         _useItem(tokenId, ITEM_FEED, amount);
-        chickens[tokenId].health += amount;
-        chickens[tokenId].happiness += amount;
         emit ChickenFed(msg.sender, tokenId, amount);
+        chickens[tokenId].health += itemHealing[itemId] * amount;
+        if (chickens[tokenId].health > 100) {
+            chickens[tokenId].health = 100;
+        }
+
     }
 
     // give chicken water
-    function waterChicken(uint256 tokenId, uint256 amount) external whenNotPaused {
+    function waterChicken(uint256 tokenId, uint256 itemId, uint256 amount) external whenNotPaused {
         require(chickens[tokenId].isHatched == true, "Chicken not hatched");
         _useItem(tokenId, ITEM_WATER, amount);
-        chickens[tokenId].health += amount;
-        chickens[tokenId].happiness += amount;
+        chickens[tokenId].health += itemHealing[itemId] * amount;
         emit ChickenWatered(msg.sender, tokenId, amount);
+        if (chickens[tokenId].health > 100) {
+            chickens[tokenId].health = 100;
+        }
     }
 
     // give chicken medicine
-    function medicateChicken(uint256 tokenId, uint256 amount) external whenNotPaused {
+    function medicateChicken(uint256 tokenId, uint256 itemId, uint256 amount) external whenNotPaused {
         require(chickens[tokenId].isHatched == true, "Chicken not hatched");
         _useItem(tokenId, ITEM_MEDICINE, amount);
-        chickens[tokenId].health += amount;
-        chickens[tokenId].happiness += amount;
+        chickens[tokenId].health += itemHealing[itemId] * amount;
         emit ChickenMedicated(msg.sender, tokenId, amount);
     }
 
@@ -165,59 +205,45 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
         Chicken memory chicken = chickens[tokenId];
         uint256 timeSinceLastInteraction = block.timestamp - chicken.lastInteraction;
         uint256 random = block.prevrandao;
-        uint256 healthChange = random % 10;
         uint256 happinessChange = random % 10;
         // update chicken health and happiness based on time since last interaction
         // this is a bit of a hack, but it works for now
         if (timeSinceLastInteraction > 1 days) {
-            chicken.health -= healthChange;
             chicken.happiness -= happinessChange;
         } else if (timeSinceLastInteraction > 12 hours) {
-            chicken.health -= healthChange / 2;
             chicken.happiness -= happinessChange / 2;
         } else if (timeSinceLastInteraction > 6 hours) {
-            chicken.health -= healthChange / 4;
             chicken.happiness -= happinessChange / 4;
         } else if (timeSinceLastInteraction > 3 hours) {
-            chicken.health -= healthChange / 8;
             chicken.happiness -= happinessChange / 8;
         } else if (timeSinceLastInteraction > 1 hours) {
-            chicken.health -= healthChange / 16;
             chicken.happiness -= happinessChange / 16;
         } else if (timeSinceLastInteraction > 30 minutes) {
-            chicken.health -= healthChange / 32;
             chicken.happiness -= happinessChange / 32;
         } else if (timeSinceLastInteraction > 15 minutes) {
-            chicken.health -= healthChange / 64;
             chicken.happiness -= happinessChange / 64;
         } else if (timeSinceLastInteraction > 5 minutes) {
-            chicken.health -= healthChange / 128;
             chicken.happiness -= happinessChange / 128;
         } else if (timeSinceLastInteraction > 1 minutes) {
-            chicken.health -= healthChange / 256;
             chicken.happiness -= happinessChange / 256;
         } else if (timeSinceLastInteraction > 30 seconds) {
-            chicken.health -= healthChange / 512;
             chicken.happiness -= happinessChange / 512;
         } else if (timeSinceLastInteraction > 10 seconds) {
-            chicken.health -= healthChange / 1024;
             chicken.happiness -= happinessChange / 1024;
         } else if (timeSinceLastInteraction > 5 seconds) {
-            chicken.health -= healthChange / 2048;
             chicken.happiness -= happinessChange / 2048;
         } else if (timeSinceLastInteraction > 1 seconds) {
-            chicken.health -= healthChange / 4096;
             chicken.happiness -= happinessChange / 4096;
         } else {
-            chicken.health -= healthChange / 8192;
             chicken.happiness -= happinessChange / 8192;
         }
         
         // cap health and happiness low at 0 and high at 100
-        if (chicken.health < 0) {
-            chicken.health = 0;
-        } else if (chicken.health > 100) {
-            chicken.health = 100;
+        if (chicken.happiness < 0) {
+            chicken.happiness = 0;
+        }
+        if (chicken.happiness > 100) {
+            chicken.happiness = 100;
         }
         chicken.lastInteraction = block.timestamp;
 
@@ -225,4 +251,15 @@ contract AvaCoqChi is ERC1155, Ownable, Pausable{
         chickens[tokenId] = chicken;
         return chicken;
     }
+
+    function playWithCoq(uint256 tokenId, itemId) external whenNotPaused {
+    require(chickens[tokenId].isHatched, "Chicken not hatched");
+    chickens[tokenId].happiness += itemHealing[itemId];
+    if (chickens[tokenId].happiness > 100) {
+        chickens[tokenId].happiness = 100;
+    }
+    emit ChickenPlayed(msg.sender, tokenId);
+    _useItem(tokenId, itemId, 1);
+}
+
 }
