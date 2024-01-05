@@ -3,12 +3,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import AvaCoqChiABI from './abis/AvaCoqChi.json';
+import COQABI from './abis/COQ.json';
 
 const Gameplay = () => {
   const [avaCoqChi, setAvaCoqChi] = useState(null);
   const [tokenId, setTokenId] = useState(1); // Example token ID for testing
   const [chickenName, setChickenName] = useState(''); // Example chicken name for testing
   const [itemAmount, setItemAmount] = useState(1); // Example amount for using items
+  const [coqInstance, setCoqInstance] = useState(null); // Instance of the COQ token contract
 
   // Get the signer and chain ID from the Web3 React context
   const { account } = useWeb3React();
@@ -22,11 +24,14 @@ const Gameplay = () => {
       const signer = provider.getSigner(account);
       const contractAddress = 'CONTRACT_ADDRESS'; // Replace with your deployed contract address
       const contractInstance = new ethers.Contract(contractAddress, AvaCoqChiABI, signer);
+      const coqAddress = '0x420FcA0121DC28039145009570975747295f2329'; // COQ deployed address
+      const coqInstance = new ethers.Contract(coqAddress, COQABI, signer);
       setAvaCoqChi(contractInstance);
+      setCoqInstance(coqInstance);
     }
   }, [account]);
 
-  // Function to request a signature from the user
+  // Function to request a signature from the user and setup the contract instance
   const requestSignature = async () => {
     if (account) {
       // Create a new Web3Provider from the global window.ethereum object
@@ -42,6 +47,19 @@ const Gameplay = () => {
       }
     }
   };
+
+  // Approve COQ token for spending
+  const approveCoq = async () => {
+    if (coqInstance) {
+      try {
+        const transaction = await coqInstance.approve('CONTRACT_ADDRESS', ethers.constants.MaxUint256);
+        await transaction.wait();
+        console.log('COQ approved!');
+      } catch (error) {
+        console.error('Error approving COQ:', error);
+      }
+    }
+  }
 
   // Function to mint an egg
   const mintEgg = async () => {
@@ -138,7 +156,7 @@ const Gameplay = () => {
         <button onClick={waterChicken}>Water Chicken</button>
         <button onClick={medicateChicken}>Medicate Chicken</button>
         <button onClick={getChickenDetails}>Get Chicken Details</button>
-        <button onClick={requestSignature}>Request Signature</button>
+        <button onClick={approveCoq}>Approve COQ</button>
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { hooks, metaMask } from '../../connectors/metaMask'
 import { Card } from '../Card'
 
-const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider, useENSNames } = hooks
+const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider } = hooks
 
 export default function MetaMaskCard() {
   const chainId = useChainId()
@@ -13,7 +13,6 @@ export default function MetaMaskCard() {
   const isActive = useIsActive()
 
   const provider = useProvider()
-  const ENSNames = useENSNames(provider)
 
   const [error, setError] = useState(undefined)
 
@@ -34,7 +33,6 @@ export default function MetaMaskCard() {
       setError={setError}
       accounts={accounts}
       provider={provider}
-      ENSNames={ENSNames}
     />
   )
 }

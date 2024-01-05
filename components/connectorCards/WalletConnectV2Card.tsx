@@ -7,7 +7,7 @@ import { Card } from '../Card'
 
 const CHAIN_IDS = Object.keys(MAINNET_CHAINS).map(Number)
 
-const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider, useENSNames } = hooks
+const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider } = hooks
 
 export default function WalletConnectV2Card() {
   const chainId = useChainId()
@@ -17,7 +17,6 @@ export default function WalletConnectV2Card() {
   const isActive = useIsActive()
 
   const provider = useProvider()
-  const ENSNames = useENSNames(provider)
 
   const [error, setError] = useState(undefined)
 
@@ -46,7 +45,6 @@ export default function WalletConnectV2Card() {
       setError={setError}
       accounts={accounts}
       provider={provider}
-      ENSNames={ENSNames}
     />
   )
 }

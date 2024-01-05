@@ -3,7 +3,10 @@ import type { BigNumber } from '@ethersproject/bignumber'
 import { formatEther } from '@ethersproject/units'
 import type { Web3ReactHooks } from '@web3-react/core'
 import { useEffect, useState } from 'react'
+import { ethers } from 'ethers'
 
+
+const COQ = '0x420FcA0121DC28039145009570975747295f2329'
 function useBalances(
   provider?: ReturnType<Web3ReactHooks['useProvider']>,
   accounts?: string[]
@@ -14,9 +17,12 @@ function useBalances(
     if (provider && accounts?.length) {
       let stale = false
 
-      void Promise.all(accounts.map((account) => provider.getBalance(account))).then((balances) => {
-        if (stale) return
-        setBalances(balances)
+      // get balances from COQ contract
+      const contract = new ethers.Contract(COQ, ['function balanceOf(address) view returns (uint256)'], provider)
+      Promise.all(accounts.map((account) => contract.balanceOf(account))).then((balances) => {
+        if (!stale) {
+          setBalances(balances)
+        }
       })
 
       return () => {
@@ -24,7 +30,8 @@ function useBalances(
         setBalances(undefined)
       }
     }
-  }, [provider, accounts])
+  }
+  , [provider, accounts])
 
   return balances
 }
@@ -32,11 +39,9 @@ function useBalances(
 export function Accounts({
   accounts,
   provider,
-  ENSNames,
 }: {
   accounts: ReturnType<Web3ReactHooks['useAccounts']>
   provider: ReturnType<Web3ReactHooks['useProvider']>
-  ENSNames: ReturnType<Web3ReactHooks['useENSNames']>
 }) {
   const balances = useBalances(provider, accounts)
 
@@ -50,8 +55,8 @@ export function Accounts({
           ? 'None'
           : accounts?.map((account, i) => (
               <ul key={account} style={{ margin: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {ENSNames?.[i] ?? account}
-                {balances?.[i] ? ` (Ξ${formatEther(balances[i])})` : null}
+                {account}
+                {balances?.[i] ? ` (COQ:${formatEther(balances[i])})` : null}
               </ul>
             ))}
       </b>
