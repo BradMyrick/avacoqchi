@@ -55,11 +55,14 @@ function convertBigNumbertoNumber(bigNumber: ethers.BigNumber) {
 }
 
 const Gameplay = () => {
-  const [avaCoqChi, setAvaCoqChi] = useState(null);
-  const [tokenId, setTokenId] = useState(1); // Example token ID for testing
-  const [chickenName, setChickenName] = useState(''); // Example chicken name for testing
-  const [itemAmount, setItemAmount] = useState(1); // Example amount for using items
-  const [coqAmount, setCoqAmount] = useState(convertBigNumbertoNumber(ethers.utils.parseEther('1000'))); // Example amount for using items
+  // State variables
+  const AvaCoqChiAddress = '0x420FcA0121DC28039145009570975747295f2329'; // TODO: replace with deployed contract address
+  const CoqAddress = '0x420FcA0121DC28039145009570975747295f2329';
+  const [avaCoqChi, setAvaCoqChi] = useState(null); // Instance of the AvaCoqChi contract
+  const [tokenId, setTokenId] = useState(0);
+  const [chickenName, setChickenName] = useState('');
+  const [itemAmount, setItemAmount] = useState(null);
+  const [coqAmount, setCoqAmount] = useState(null);
   const [coqInstance, setCoqInstance] = useState(null); // Instance of the COQ token contract
   const [eggStatus, setEggStatus] = useState<EggStatus>(EggStatus.Unminted);
   const [chickenStatus, setChickenStatus] = useState<ChickenStatus>(ChickenStatus.UnHatched);
@@ -71,6 +74,16 @@ const Gameplay = () => {
     lastinteracted: 0,
   });
 
+  useEffect(() => {
+    // update the chicken details
+    setChickenDetails({
+      name: chickenName,
+      health: 100,
+      hunger: 100,
+      happiness: 100,
+      lastinteracted: 0,
+    });
+  }, [chickenName]);
 
 
   // Get the signer and chain ID from the Web3 React context
@@ -102,7 +115,7 @@ const Gameplay = () => {
         setChickenStatus(ChickenStatus.Normal);
       }, 6000);
     }
-    
+
   }, [eggStatus]);
 
   // Initialize the AvaCoqChi contract
@@ -112,10 +125,8 @@ const Gameplay = () => {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       // Get the signer from the provider
       const signer = provider.getSigner(account);
-      const contractAddress = '0x420FcA0121DC28039145009570975747295f2329'; // Replace with your deployed contract address
-      const contractInstance = new ethers.Contract(contractAddress, AvaCoqChiABI, signer);
-      const coqAddress = ethers.utils.getAddress('0x420FcA0121DC28039145009570975747295f2329')
-      const coqInstance = new ethers.Contract(coqAddress, COQABI, signer);
+      const contractInstance = new ethers.Contract(AvaCoqChiAddress, AvaCoqChiABI, signer);
+      const coqInstance = new ethers.Contract(CoqAddress, COQABI, signer);
       setAvaCoqChi(contractInstance);
       setCoqInstance(coqInstance);
     }
@@ -201,7 +212,7 @@ const Gameplay = () => {
     console.log('approving COQ');
     if (coqInstance) {
       try {
-        const transaction = await coqInstance.approve(ethers.utils.getAddress('0x420FcA0121DC28039145009570975747295f2329'), ethers.constants.MaxUint256);
+        const transaction = await coqInstance.approve(ethers.utils.getAddress(CoqAddress), ethers.constants.MaxUint256);
         await transaction.wait();
         console.log('COQ approved!');
       } catch (error) {
@@ -283,6 +294,19 @@ const Gameplay = () => {
     }
   };
 
+  // Function to approve COQ token for spending
+  const approveSetCoq = async () => {
+    if (coqInstance) {
+      try {
+        const transaction = await coqInstance.approve(ethers.utils.getAddress(AvaCoqChiAddress), ethers.utils.parseEther(coqAmount.toString()));
+        await transaction.wait();
+        console.log('COQ approved!');
+      } catch (error) {
+        console.error('Error approving COQ:', error);
+      }
+    }
+  }
+
   // Function to get chicken details
   const getChickenDetails = useCallback(async () => {
     if (avaCoqChi) {
@@ -303,17 +327,35 @@ const Gameplay = () => {
   // Render the gameplay UI here
   return (
     <div className="gameplay-container">
-      <h1>Gameplay</h1>
-      <input
-        type="text"
-        placeholder="Name your CoqChi"
-        value={chickenName}
-        onChange={(e) => setChickenName(e.target.value)}
-      />
       <div className="play-image">
         <Image src={getImageType()} alt="CoqChi" width={500} height={500} />
       </div>
-      <button onClick={mintEgg}>Mint Egg</button>
+
+      {eggStatus === EggStatus.Unminted ? (
+        <>
+          <input
+            type="text"
+            placeholder="Name your CoqChi"
+            value={chickenName}
+            onChange={(e) => setChickenName(e.target.value)}
+          />
+          <button onClick={mintEgg}>Mint Egg</button>
+        </>
+
+      ) : (
+
+        <>
+          <div className="chicken-name">
+            <p>Name: {chickenDetails.name}</p>
+          </div>
+          <div className="chicken-status">
+            <p>Health: {chickenDetails.health}</p>
+            <p>Hunger: {chickenDetails.hunger}</p>
+            <p>Happiness: {chickenDetails.happiness}</p>
+            <p>Last Interacted: {chickenDetails.lastinteracted}</p>
+          </div>
+        </>
+      )}
 
       <div className="controller-container">
         <button onClick={hatchEgg}>Hatch Egg</button>
@@ -326,8 +368,9 @@ const Gameplay = () => {
           type="number"
           placeholder="Amount of COQ"
           value={coqAmount}
-          onChange={(e) => setItemAmount(parseInt(e.target.value))}
+          onChange={(e) => setCoqAmount(parseInt(e.target.value))}
         />
+        <button onClick={approveSetCoq}>Aprove Set Amount of COQ</button>
       </div>
     </div>
   );
