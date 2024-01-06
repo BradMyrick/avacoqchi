@@ -227,3 +227,13 @@ body {
   gap: 1rem;
 
 }
+
+/* images */
+.play-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
