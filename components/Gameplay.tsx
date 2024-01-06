@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
-import AvaCoqChiABI from './abis/AvaCoqChi.json';
+import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails } from './Interactions';
+
 import COQABI from './abis/COQ.json';
 import Image from 'next/image';
 // import images
@@ -56,16 +57,17 @@ function convertBigNumbertoNumber(bigNumber: ethers.BigNumber) {
 
 const Gameplay = () => {
   // State variables
-  const AvaCoqChiAddress = '0x420FcA0121DC28039145009570975747295f2329'; // TODO: replace with deployed contract address
+  const ItemsAddress = '0x420FcA0121DC28039145009570975747295f2329';
   const CoqAddress = '0x420FcA0121DC28039145009570975747295f2329';
-  const [avaCoqChi, setAvaCoqChi] = useState(null); // Instance of the AvaCoqChi contract
   const [tokenId, setTokenId] = useState(0);
   const [chickenName, setChickenName] = useState('');
-  const [itemAmount, setItemAmount] = useState(null);
-  const [coqAmount, setCoqAmount] = useState(null);
+  const [itemAmount, setItemAmount] = useState(0);
+  const [coqAmount, setCoqAmount] = useState('');
   const [coqInstance, setCoqInstance] = useState(null); // Instance of the COQ token contract
   const [eggStatus, setEggStatus] = useState<EggStatus>(EggStatus.Unminted);
   const [chickenStatus, setChickenStatus] = useState<ChickenStatus>(ChickenStatus.UnHatched);
+  const [isEgg, setIsEgg] = useState(true); // [egg, hatchling, normal
+
   const [chickenDetails, setChickenDetails] = useState<ChickenDetails>({
     name: '',
     health: 0,
@@ -118,21 +120,6 @@ const Gameplay = () => {
 
   }, [eggStatus]);
 
-  // Initialize the AvaCoqChi contract
-  useEffect(() => {
-    if (account) {
-      // Create a new Web3Provider from the global window.ethereum object
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // Get the signer from the provider
-      const signer = provider.getSigner(account);
-      const contractInstance = new ethers.Contract(AvaCoqChiAddress, AvaCoqChiABI, signer);
-      const coqInstance = new ethers.Contract(CoqAddress, COQABI, signer);
-      setAvaCoqChi(contractInstance);
-      setCoqInstance(coqInstance);
-    }
-  }, [account]);
-
-  const [isEgg, setIsEgg] = useState(true); // [egg, hatchling, normal
   const [isHatchling, setIsHatchling] = useState(false);
   const [isNormal, setIsNormal] = useState(false);
 
@@ -221,84 +208,12 @@ const Gameplay = () => {
     }
   }
 
-  // Function to mint an egg
-  const mintEgg = async () => {
-    setEggStatus(EggStatus.Minted);
-    console.log('mintEgg');
-    // TODO: move this down after testing
-    /*
-    if (avaCoqChi) {
-      try {
-        const transaction = await avaCoqChi.mintEgg();
-        await transaction.wait();
-        console.log('Egg minted!');
-      } catch (error) {
-        console.error('Error minting egg:', error);
-      }
-    }
-    */
-  };
-
-  // Function to hatch an egg
-  const hatchEgg = async () => {
-    // TODO: move this down after testing
-    setEggStatus(EggStatus.Hatched);
-    console.log('hatchEgg');
-    //if (avaCoqChi && chickenName) {
-    //  try {
-    //    const transaction = await avaCoqChi.hatchEgg(tokenId, chickenName);
-    //    await transaction.wait();
-    //    console.log('Egg hatched!');
-    //  } catch (error) {
-    //    console.error('Error hatching egg:', error);
-    //  }
-    //}
-  };
-
-  // Function to feed the chicken
-  const feedChicken = async () => {
-    if (avaCoqChi) {
-      try {
-        const transaction = await avaCoqChi.feedChicken(tokenId, itemAmount);
-        await transaction.wait();
-        console.log('Chicken fed!');
-      } catch (error) {
-        console.error('Error feeding chicken:', error);
-      }
-    }
-  };
-
-  // Function to water the chicken
-  const waterChicken = async () => {
-    if (avaCoqChi) {
-      try {
-        const transaction = await avaCoqChi.waterChicken(tokenId, itemAmount);
-        await transaction.wait();
-        console.log('Chicken watered!');
-      } catch (error) {
-        console.error('Error watering chicken:', error);
-      }
-    }
-  };
-
-  // Function to medicate the chicken
-  const medicateChicken = async () => {
-    if (avaCoqChi) {
-      try {
-        const transaction = await avaCoqChi.medicateChicken(tokenId, itemAmount);
-        await transaction.wait();
-        console.log('Chicken medicated!');
-      } catch (error) {
-        console.error('Error medicating chicken:', error);
-      }
-    }
-  };
 
   // Function to approve COQ token for spending
   const approveSetCoq = async () => {
     if (coqInstance) {
       try {
-        const transaction = await coqInstance.approve(ethers.utils.getAddress(AvaCoqChiAddress), ethers.utils.parseEther(coqAmount.toString()));
+        const transaction = await coqInstance.approve(ethers.utils.getAddress(ItemsAddress), ethers.utils.parseEther(coqAmount.toString()));
         await transaction.wait();
         console.log('COQ approved!');
       } catch (error) {
@@ -307,22 +222,38 @@ const Gameplay = () => {
     }
   }
 
-  // Function to get chicken details
-  const getChickenDetails = useCallback(async () => {
-    if (avaCoqChi) {
-      try {
-        const details = await avaCoqChi.getChickenDetails(tokenId);
-        console.log('Chicken details:', details);
-        setChickenDetails(details);
-      } catch (error) {
-        console.error('Error getting chicken details:', error);
-      }
-    }
-    else {
-      console.log('avaCoqChi is null');
 
-    }
-  }, [avaCoqChi, tokenId]);
+  // Example function to handle minting an egg
+  const handleMintEgg = async () => {
+    await mintEgg(chickenName);
+  };
+
+  // Example function to handle hatching an egg
+  const handleHatchEgg = async () => {
+    await hatchEgg(tokenId);
+  };
+
+  // Example function to handle feeding a chicken
+  const handleFeedChicken = async () => {
+    await feedChicken(tokenId, itemAmount);
+  };
+
+  // Example function to handle watering a chicken
+  const handleWaterChicken = async () => {
+    await waterChicken(tokenId, itemAmount);
+  };
+
+  // Example function to handle medicating a chicken
+  const handleMedicateChicken = async () => {
+    await medicateChicken(tokenId, itemAmount);
+  };
+
+  // Example function to get chicken details
+  const handleGetChickenDetails = async () => {
+    const details = await getChickenDetails(tokenId);
+    // Do something with the details
+  };
+
 
   // Render the gameplay UI here
   return (
@@ -358,17 +289,17 @@ const Gameplay = () => {
       )}
 
       <div className="controller-container">
-        <button onClick={hatchEgg}>Hatch Egg</button>
-        <button onClick={feedChicken}>Feed Chicken</button>
-        <button onClick={waterChicken}>Water Chicken</button>
-        <button onClick={medicateChicken}>Medicate Chicken</button>
-        <button onClick={getChickenDetails}>Get Chicken Details</button>
+        <button onClick={handleHatchEgg}>Hatch Egg</button>
+        <button onClick={handleFeedChicken}>Feed Chicken</button>
+        <button onClick={handleWaterChicken}>Water Chicken</button>
+        <button onClick={handleMedicateChicken}>Medicate Chicken</button>
+        <button onClick={handleGetChickenDetails}>Get Chicken Details</button>
         <button onClick={approveCoq}>Approve All COQ</button>
         <input
           type="number"
           placeholder="Amount of COQ"
           value={coqAmount}
-          onChange={(e) => setCoqAmount(parseInt(e.target.value))}
+          onChange={(e) => setCoqAmount(e.target.value)}
         />
         <button onClick={approveSetCoq}>Aprove Set Amount of COQ</button>
       </div>
