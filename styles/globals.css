@@ -215,6 +215,12 @@ body {
   background-color: #f0b400;
 }
 .chicken-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
   
 }
 .chicken-image {

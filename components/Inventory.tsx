@@ -3,31 +3,39 @@ import React, { useEffect, useState } from 'react';
 import ItemsCard from './ItemCard';
 import { ethers } from 'ethers';
 import { getInventory } from './Interactions';
-
+import { hooks, metaMask } from '../connectors/metaMask'
+const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider } = hooks
 const Inventory = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const provider = useProvider()
+  const accounts = useAccounts()
+
+  const getInventoryItems = async () => {
+    if (!provider || !accounts) return;
+    const inventory = await getInventory(provider, accounts[0]);
+    setInventoryItems(inventory);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    const getItems = async () => {
-      const items = await getInventory();
-      setInventoryItems(items);
-      setLoading(false);
-    };
-    getItems();
+    getInventoryItems();
   }, []);
-
-  const renderItems = () => {
-    return inventoryItems.map((item, index) => {
-      return <ItemsCard key={index} name={item.name} description={item.description} />;
-    });
-  };
-
   return (
-    <div className="inventory">
-      <h1>Inventory</h1>
-      <div className="inventory-items">{renderItems()}</div>
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="text-4xl font-bold">Inventory</h1>
+      <div className="flex flex-wrap justify-center">
+        {inventoryItems.map((item, index) => (
+          <ItemsCard
+            key={index}
+            name={item.name}
+            description={item.description}
+          />
+        ))}
+      </div>
     </div>
   );
-
 }
+
+export default Inventory;

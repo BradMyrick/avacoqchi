@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails, approveAllCoq, approveSomeCoq } from './Interactions';
+import { hooks, metaMask } from '../connectors/metaMask'
+const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider } = hooks
 
 import Image from 'next/image';
 // import images from constants
@@ -165,29 +167,47 @@ const Gameplay = () => {
 
 
   const handleMintEgg = async () => {
-    await mintEgg(chickenName);
-    // TODO: get token id and set it after minting
-
+    await mintEgg(
+      useProvider(),
+      chickenName,
+    );
   };
 
   const handleHatchEgg = async () => {
-    await hatchEgg(tokenId);
+    await hatchEgg(
+      useProvider(),
+      tokenId,
+    );
   };
 
   const handleFeedChicken = async () => {
-    await feedChicken(tokenId, itemAmount);
+    await feedChicken(
+      useProvider(),
+      tokenId,
+      itemAmount,
+    );
   };
 
   const handleWaterChicken = async () => {
-    await waterChicken(tokenId, itemAmount);
+    await waterChicken(
+      useProvider(),
+      tokenId, 
+      itemAmount);
   };
 
   const handleMedicateChicken = async () => {
-    await medicateChicken(tokenId, itemAmount);
+    await medicateChicken(      
+      useProvider(),
+      tokenId, 
+      itemAmount
+      );
   };
 
   const handleGetChickenDetails = async () => {
-    const details = await getChickenDetails(tokenId);
+    const details = await getChickenDetails(
+      useProvider(),
+      tokenId,
+    );
     console.log('details', details);
     setChickenDetails(details);
   };
@@ -197,7 +217,10 @@ const Gameplay = () => {
   };
 
   const handleApproveSomeCoq = async () => {
-    await approveSomeCoq(coqAmount);
+    await approveSomeCoq(
+      useProvider(),
+      Number(ethers.utils.parseEther(coqAmount)),
+      );
   };
 
   // Render the gameplay UI here

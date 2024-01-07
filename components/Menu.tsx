@@ -1,7 +1,6 @@
 // Menu.tsx is a component that renders a menu that allows the user to select a wallet and interact with the game.
 import React, { useState, useEffect } from 'react';
 import MetaMaskCard from './connectorCards/MetaMaskCard';
-import WalletConnectCard from './connectorCards/WalletConnectV2Card';
 import Inventory from './Inventory';
 
 const Menu = () => {
@@ -24,10 +23,8 @@ const Menu = () => {
       <div className={`menu-container ${isOpen ? 'open' : ''}`}>
         <div className="wallet-selector">
           <button onClick={() => handleWalletSelection('metamask')}>MetaMask</button>
-          <button onClick={() => handleWalletSelection('walletconnect')}>WalletConnect</button>
         </div>
         {selectedWallet === 'metamask' && <MetaMaskCard />}
-        {selectedWallet === 'walletconnect' && <WalletConnectCard />}
         <Inventory />
       </div>
     </>

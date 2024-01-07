@@ -1,7 +1,6 @@
 // Card.tsx
 import type { Web3ReactHooks } from '@web3-react/core';
 import type { MetaMask } from '@web3-react/metamask';
-import type { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2';
 
 import { getName } from '../utils';
 import { Accounts } from './Accounts';
@@ -10,7 +9,7 @@ import { ConnectWithSelect } from './ConnectWithSelect';
 import { Status } from './Status';
 
 interface Props {
-  connector: MetaMask | WalletConnectV2;
+  connector: MetaMask;
   activeChainId: ReturnType<Web3ReactHooks['useChainId']>;
   chainIds?: ReturnType<Web3ReactHooks['useChainId']>[];
   isActivating: ReturnType<Web3ReactHooks['useIsActivating']>;

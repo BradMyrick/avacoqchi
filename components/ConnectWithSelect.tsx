@@ -1,7 +1,6 @@
 // ConnectWithSelect.tsx
 import type { Web3ReactHooks } from '@web3-react/core'
 import { MetaMask } from '@web3-react/metamask'
-import { WalletConnect as WalletConnectV2 } from '@web3-react/walletconnect-v2'
 import { useCallback, useEffect, useState } from 'react'
 
 import { CHAINS, getAddChainParameters } from '../chains'
@@ -45,7 +44,7 @@ export function ConnectWithSelect({
   error,
   setError,
 }: {
-  connector: MetaMask | WalletConnectV2
+  connector: MetaMask;
   activeChainId: ReturnType<Web3ReactHooks['useChainId']>
   chainIds?: ReturnType<Web3ReactHooks['useChainId']>[]
   isActivating: ReturnType<Web3ReactHooks['useIsActivating']>
@@ -81,10 +80,6 @@ export function ConnectWithSelect({
 
         if (desiredChainId === defaultChain) {
           await connector.activate()
-        } else if (
-          connector instanceof WalletConnectV2
-        ) {
-          await connector.activate(desiredChainId)
         } else {
           await connector.activate(getAddChainParameters(desiredChainId))
         }

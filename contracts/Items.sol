@@ -158,4 +158,15 @@ contract Items is ERC1155, Ownable {
         emit TokensWithdrawn(msg.sender, balance);
     }
 
+    function getInventory(
+        address user
+    ) external view returns (uint256[] memory, uint256[] memory) {
+        uint256[] memory ids = new uint256[](9);
+        uint256[] memory amounts = new uint256[](9);
+        for (uint256 i = 0; i < 9; i++) {
+            ids[i] = i;
+            amounts[i] = balanceOf(user, i);
+        }
+        return (ids, amounts);
+    }
 }
