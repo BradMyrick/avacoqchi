@@ -1,31 +1,26 @@
 // Gameplay.tsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useWeb3React } from '@web3-react/core';
+import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails } from './Interactions';
+import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails, approveAllCoq, approveSomeCoq } from './Interactions';
 
-import COQABI from './abis/COQ.json';
 import Image from 'next/image';
-// import images
+// import images from constants
 // eggs
-import egg1 from './images/coq/egg/1.png';
-import egg2 from './images/coq/egg/2.png';
-import egg3 from './images/coq/egg/3.png';
-// hachling
-import hackling1 from './images/coq/hachling/1.png';
-// normal
-import normal1 from './images/coq/normal/1.png';
-import normal2 from './images/coq/normal/2.png';
-import normal3 from './images/coq/normal/3.png';
-// angry
-import angry1 from './images/coq/angry/1.png';
-import angry2 from './images/coq/angry/2.png';
-import angry3 from './images/coq/angry/3.png';
-// sick
-// hungry
-import hungry1 from './images/coq/hungry/1.png';
-import hungry2 from './images/coq/hungry/2.png';
-import hungry3 from './images/coq/hungry/3.png';
+import {
+  EGG1_IMAGE_PATH,
+  EGG2_IMAGE_PATH,
+  EGG3_IMAGE_PATH,
+  HATCHLING1_IMAGE_PATH,
+  NORMAL1_IMAGE_PATH,
+  NORMAL2_IMAGE_PATH,
+  NORMAL3_IMAGE_PATH,
+  ANGRY1_IMAGE_PATH,
+  ANGRY2_IMAGE_PATH,
+  ANGRY3_IMAGE_PATH,
+  HUNGRY1_IMAGE_PATH,
+  HUNGRY2_IMAGE_PATH,
+  HUNGRY3_IMAGE_PATH,
+} from '../constants';
 
 enum EggStatus {
   Unminted,
@@ -50,15 +45,8 @@ type ChickenDetails = {
   lastinteracted: number;
 };
 
-
-function convertBigNumbertoNumber(bigNumber: ethers.BigNumber) {
-  return parseInt(bigNumber.toString());
-}
-
 const Gameplay = () => {
   // State variables
-  const ItemsAddress = '0x420FcA0121DC28039145009570975747295f2329';
-  const CoqAddress = '0x420FcA0121DC28039145009570975747295f2329';
   const [tokenId, setTokenId] = useState(0);
   const [chickenName, setChickenName] = useState('');
   const [itemAmount, setItemAmount] = useState(0);
@@ -76,6 +64,7 @@ const Gameplay = () => {
     lastinteracted: 0,
   });
 
+  
   useEffect(() => {
     // update the chicken details
     setChickenDetails({
@@ -87,9 +76,6 @@ const Gameplay = () => {
     });
   }, [chickenName]);
 
-
-  // Get the signer and chain ID from the Web3 React context
-  const { account } = useWeb3React();
 
   // refresh the image anytime the eggStatus or chickenStatus changes
   useEffect(() => {
@@ -103,13 +89,13 @@ const Gameplay = () => {
       setIsNormal(false);
     }
     else if (eggStatus === EggStatus.Hatched) {
-      // show egg3 for 5 seconds then show hatchling1
+      // show EGG3_IMAGE_PATH for 5 seconds then show HATCHLING1_IMAGE_PATH
       setTimeout(() => {
         setIsEgg(false);
         setIsHatchling(true);
         setIsNormal(false);
       }, 3000);
-      // show hatchling1 for 5 seconds then show normal1
+      // show HATCHLING1_IMAGE_PATH for 5 seconds then show NORMAL1_IMAGE_PATH
       setTimeout(() => {
         setIsEgg(false);
         setIsHatchling(false);
@@ -129,7 +115,7 @@ const Gameplay = () => {
       return getEggImage();
     }
     else if (isHatchling) {
-      return hackling1;
+      return HATCHLING1_IMAGE_PATH;
     }
     else if (isNormal) {
       return getChickenImage();
@@ -140,13 +126,13 @@ const Gameplay = () => {
     console.log('eggStatus', eggStatus);
     switch (eggStatus) {
       case EggStatus.Unminted:
-        return egg1;
+        return EGG1_IMAGE_PATH;
       case EggStatus.Minted:
-        return egg2;
+        return EGG2_IMAGE_PATH;
       case EggStatus.Hatched:
-        return egg3;
+        return EGG3_IMAGE_PATH;
       default:
-        return egg1; // Default to unminted egg image
+        return EGG1_IMAGE_PATH; // Default to unminted egg image
     }
   };
 
@@ -155,105 +141,64 @@ const Gameplay = () => {
     switch (chickenStatus) {
       case ChickenStatus.Normal:
         // return a random normal image
-        const normalImages = [normal1, normal2, normal3];
+        const normalImages = [NORMAL1_IMAGE_PATH, NORMAL2_IMAGE_PATH, NORMAL3_IMAGE_PATH];
         const randomNormalImage = normalImages[Math.floor(Math.random() * normalImages.length)];
         return randomNormalImage;
       case ChickenStatus.Angry:
         // return a random angry image
-        const angryImages = [angry1, angry2, angry3];
+        const angryImages = [ANGRY1_IMAGE_PATH, ANGRY2_IMAGE_PATH, ANGRY3_IMAGE_PATH];
         const randomAngryImage = angryImages[Math.floor(Math.random() * angryImages.length)];
         return randomAngryImage;
       case ChickenStatus.Sick:
         // return a random sick image
-        return normal1;
+        return NORMAL1_IMAGE_PATH;
       case ChickenStatus.Hungry:
         // return a random hungry image
-        const hungryImages = [hungry1, hungry2, hungry3];
+        const hungryImages = [HUNGRY1_IMAGE_PATH, HUNGRY2_IMAGE_PATH, HUNGRY3_IMAGE_PATH];
         const randomHungryImage = hungryImages[Math.floor(Math.random() * hungryImages.length)];
         return randomHungryImage;
       default:
-        return normal1; // Default to normal1 image
+        return NORMAL1_IMAGE_PATH; // Default to NORMAL1_IMAGE_PATH image
     }
   };
 
 
-  // Function to request a signature from the user and setup the contract instance
-  const requestSignature = async () => {
-    if (account) {
-      // Create a new Web3Provider from the global window.ethereum object
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      // Get the signer from the provider
-      const signer = provider.getSigner(account);
-      const message = "Please sign this message to confirm your identity.";
-      try {
-        const signature = await signer.signMessage(message);
-        console.log('Signature:', signature);
-      } catch (error) {
-        console.error('Error requesting signature:', error);
-      }
-    }
-  };
 
-  // Approve COQ token for spending
-  const approveCoq = async () => {
-    console.log('approving COQ');
-    if (coqInstance) {
-      try {
-        const transaction = await coqInstance.approve(ethers.utils.getAddress(CoqAddress), ethers.constants.MaxUint256);
-        await transaction.wait();
-        console.log('COQ approved!');
-      } catch (error) {
-        console.error('Error approving COQ:', error);
-      }
-    }
-  }
-
-
-  // Function to approve COQ token for spending
-  const approveSetCoq = async () => {
-    if (coqInstance) {
-      try {
-        const transaction = await coqInstance.approve(ethers.utils.getAddress(ItemsAddress), ethers.utils.parseEther(coqAmount.toString()));
-        await transaction.wait();
-        console.log('COQ approved!');
-      } catch (error) {
-        console.error('Error approving COQ:', error);
-      }
-    }
-  }
-
-
-  // Example function to handle minting an egg
   const handleMintEgg = async () => {
     await mintEgg(chickenName);
+    // TODO: get token id and set it after minting
+
   };
 
-  // Example function to handle hatching an egg
   const handleHatchEgg = async () => {
     await hatchEgg(tokenId);
   };
 
-  // Example function to handle feeding a chicken
   const handleFeedChicken = async () => {
     await feedChicken(tokenId, itemAmount);
   };
 
-  // Example function to handle watering a chicken
   const handleWaterChicken = async () => {
     await waterChicken(tokenId, itemAmount);
   };
 
-  // Example function to handle medicating a chicken
   const handleMedicateChicken = async () => {
     await medicateChicken(tokenId, itemAmount);
   };
 
-  // Example function to get chicken details
   const handleGetChickenDetails = async () => {
     const details = await getChickenDetails(tokenId);
-    // Do something with the details
+    console.log('details', details);
+    setChickenDetails(details);
   };
 
+  const handleApproveAllCoq = async () => {
+    await approveAllCoq();
+  };
+
+  const handleApproveSomeCoq = async () => {
+    await approveSomeCoq(coqAmount);
+  };
 
   // Render the gameplay UI here
   return (
@@ -270,7 +215,7 @@ const Gameplay = () => {
             value={chickenName}
             onChange={(e) => setChickenName(e.target.value)}
           />
-          <button onClick={mintEgg}>Mint Egg</button>
+          <button onClick={handleMintEgg}>Mint Egg</button>
         </>
 
       ) : (
@@ -294,14 +239,14 @@ const Gameplay = () => {
         <button onClick={handleWaterChicken}>Water Chicken</button>
         <button onClick={handleMedicateChicken}>Medicate Chicken</button>
         <button onClick={handleGetChickenDetails}>Get Chicken Details</button>
-        <button onClick={approveCoq}>Approve All COQ</button>
+        <button onClick={handleApproveAllCoq}>Approve All COQ</button>
         <input
           type="number"
           placeholder="Amount of COQ"
           value={coqAmount}
           onChange={(e) => setCoqAmount(e.target.value)}
         />
-        <button onClick={approveSetCoq}>Aprove Set Amount of COQ</button>
+        <button onClick={handleApproveSomeCoq}>Aprove Set Amount of COQ</button>
       </div>
     </div>
   );

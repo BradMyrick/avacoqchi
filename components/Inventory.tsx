@@ -1,23 +1,33 @@
 // Inventory.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ItemsCard from './ItemCard';
+import { ethers } from 'ethers';
+import { getInventory } from './Interactions';
 
 const Inventory = () => {
-  // TODO: Fetch the inventory items from backend
-  const inventoryItems = [
-    { id: 1, name: 'Feed', description: 'Sustenance for chickens' },
-    { id: 2, name: 'Water', description: 'Hydration is key' },
-    { id: 3, name: 'Medicine', description: 'Heals wounds' },
-  ];
+  const [inventoryItems, setInventoryItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getItems = async () => {
+      const items = await getInventory();
+      setInventoryItems(items);
+      setLoading(false);
+    };
+    getItems();
+  }, []);
+
+  const renderItems = () => {
+    return inventoryItems.map((item, index) => {
+      return <ItemsCard key={index} name={item.name} description={item.description} />;
+    });
+  };
 
   return (
     <div className="inventory">
-      <h3>Inventory</h3>
-      {inventoryItems.map(item => (
-        <ItemsCard key={item.id} name={item.name} description={item.description} />
-      ))}
+      <h1>Inventory</h1>
+      <div className="inventory-items">{renderItems()}</div>
     </div>
   );
-};
 
-export default Inventory;
+}
