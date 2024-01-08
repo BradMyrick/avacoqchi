@@ -11,8 +11,11 @@ import "./Items.sol";
 contract Gameplay is Ownable {
     CoqChi public chickenContract;
     Items public itemsContract;
+    ERC20 public coqContract;
 
     uint256 public playAmount;
+
+    uint256 public eggPrice;
     // Events
     event ChickenFed(address indexed owner, uint256 tokenId, uint256 amount);
     event ChickenWatered(
@@ -39,6 +42,7 @@ contract Gameplay is Ownable {
     mapping(uint256 => uint256) public chickenWaterPower;
     mapping(uint256 => uint256) public chickenMedicinePower;
 
+    // constructor
     constructor(
         address _chickenAddress,
         address _itemsAddress
@@ -48,18 +52,32 @@ contract Gameplay is Ownable {
         itemsContract = Items(_itemsAddress);
     }
 
+    // set chicken contract address
     function setChickenContract(address _chickenAddress) external onlyOwner {
         chickenContract = CoqChi(_chickenAddress);
     }
 
+    // set items contract address
     function setItemsContract(address _itemsAddress) external onlyOwner {
         itemsContract = Items(_itemsAddress);
     }
 
+    // set play amount
     function setPlayAmount(uint256 _playAmount) external onlyOwner {
         playAmount = _playAmount;
     }
 
+    // set Conq Inu contract address
+    function setCoqContract(address _coqAddress) external onlyOwner {
+        coqContract = ERC20(_coqAddress);
+    }
+
+    // set egg price
+    function setEggPrice(uint256 _eggPrice) external onlyOwner {
+        eggPrice = _eggPrice;
+    }
+
+    // use feed
     function useFeed(uint256 itemId, uint256 amount) external {
         require(
             chickenContract.ownerOf(itemId) == msg.sender,
@@ -73,6 +91,7 @@ contract Gameplay is Ownable {
         );
     }
 
+    // use water
     function useWater(uint256 itemId, uint256 amount) external {
         require(
             chickenContract.ownerOf(itemId) == msg.sender,
@@ -86,6 +105,7 @@ contract Gameplay is Ownable {
         );
     }
 
+    // use medicine
     function useMedicine(uint256 tokenId, uint256 itemId, uint256 amount) external {
         require(
             chickenContract.ownerOf(tokenId) == msg.sender,
@@ -99,6 +119,7 @@ contract Gameplay is Ownable {
         );
     }
 
+    // hatch egg
     function hatchEgg(uint256 tokenId, string memory name) external {
         require(
             chickenContract.ownerOf(tokenId) == msg.sender,
@@ -108,6 +129,7 @@ contract Gameplay is Ownable {
         chickenContract.hatchEgg(tokenId, name);
     }
 
+    // play with chicken
     function playWithChicken(uint256 tokenId) external {
         require(
             chickenContract.ownerOf(tokenId) == msg.sender,
@@ -117,6 +139,7 @@ contract Gameplay is Ownable {
         chickenContract.updateChickenHappiness(tokenId, playAmount);
     }
 
+    // update last interaction
     function updateChickenLastInteraction(uint256 tokenId) external {
         require(
             chickenContract.ownerOf(tokenId) == msg.sender,
@@ -173,10 +196,12 @@ contract Gameplay is Ownable {
         chickenContract.updateChickenLastInteraction(tokenId, block.timestamp);
     }
 
+    // dead chicken
     function _deadChicken(uint256 tokenId) internal {
         chickenContract.deadChicken(tokenId);
     }
 
+    // calculate hunger damage
     function _calculateHungerDamage(
         uint256 lastInteraction
     ) internal view returns (uint256) {
@@ -202,6 +227,7 @@ contract Gameplay is Ownable {
         }
     }
 
+    // calculate happiness damage
     function _calculateHappinessDamage(
         uint256 lastInteraction
     ) internal view returns (uint256) {
@@ -228,6 +254,7 @@ contract Gameplay is Ownable {
         }
     }
 
+    // calculate health damage
     function _calculateHealthDamage(
         uint256 tokenId
     ) internal view returns (uint256) {
@@ -242,4 +269,23 @@ contract Gameplay is Ownable {
             return 0;
         }
     }
+
+    // withdraw tokens
+    function withdrawTokens(address tokenAddress, uint256 amount) external onlyOwner {
+        require(amount > 0, "Amount must be greater than 0");
+        IERC20 token = IERC20(tokenAddress);
+        token.transfer(msg.sender, amount);
+    }
+
+    // mint egg
+    function mintEgg(string calldata _name) external onlyOwner {
+        require(coqContract.balanceOf(msg.sender) >= eggPrice, "Not enough Coq Inu");
+        chickenContract.mintEgg(_name);
+    }
+
+    // get chicken details
+    function getChickenDetails(uint256 tokenId) external view returns (ChickenLib.Chicken memory) {
+        return chickenContract.getChickenDetails(tokenId);
+    }
+
 }

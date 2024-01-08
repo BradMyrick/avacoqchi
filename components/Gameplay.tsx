@@ -2,27 +2,24 @@
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails, approveAllCoq, approveSomeCoq } from './Interactions';
-import { hooks, metaMask } from '../connectors/metaMask'
-const { useChainId, useAccounts, useIsActivating, useIsActive, useProvider } = hooks
-
+ './images/coq/egg/1.png';
 import Image from 'next/image';
 // import images from constants
-// eggs
-import {
-  EGG1_IMAGE_PATH,
-  EGG2_IMAGE_PATH,
-  EGG3_IMAGE_PATH,
-  HATCHLING1_IMAGE_PATH,
-  NORMAL1_IMAGE_PATH,
-  NORMAL2_IMAGE_PATH,
-  NORMAL3_IMAGE_PATH,
-  ANGRY1_IMAGE_PATH,
-  ANGRY2_IMAGE_PATH,
-  ANGRY3_IMAGE_PATH,
-  HUNGRY1_IMAGE_PATH,
-  HUNGRY2_IMAGE_PATH,
-  HUNGRY3_IMAGE_PATH,
-} from '../constants';
+
+import EGG1_IMAGE_PATH from './images/coq/egg/1.png';
+import EGG2_IMAGE_PATH from './images/coq/egg/2.png';
+import EGG3_IMAGE_PATH from './images/coq/egg/3.png';
+import HATCHLING1_IMAGE_PATH from './images/coq/hatchling/1.png';
+import NORMAL1_IMAGE_PATH from './images/coq/normal/1.png';
+import NORMAL2_IMAGE_PATH from './images/coq/normal/2.png';
+import NORMAL3_IMAGE_PATH from './images/coq/normal/3.png';
+import ANGRY1_IMAGE_PATH from './images/coq/angry/1.png';
+import ANGRY2_IMAGE_PATH from './images/coq/angry/2.png';
+import ANGRY3_IMAGE_PATH from './images/coq/angry/3.png';
+import HUNGRY1_IMAGE_PATH from './images/coq/hungry/1.png';
+import HUNGRY2_IMAGE_PATH from './images/coq/hungry/2.png';
+import HUNGRY3_IMAGE_PATH from './images/coq/hungry/3.png';
+
 
 enum EggStatus {
   Unminted,
@@ -57,6 +54,7 @@ const Gameplay = () => {
   const [eggStatus, setEggStatus] = useState<EggStatus>(EggStatus.Unminted);
   const [chickenStatus, setChickenStatus] = useState<ChickenStatus>(ChickenStatus.UnHatched);
   const [isEgg, setIsEgg] = useState(true); // [egg, hatchling, normal
+
 
   const [chickenDetails, setChickenDetails] = useState<ChickenDetails>({
     name: '',
@@ -168,21 +166,18 @@ const Gameplay = () => {
 
   const handleMintEgg = async () => {
     await mintEgg(
-      useProvider(),
       chickenName,
     );
   };
 
   const handleHatchEgg = async () => {
     await hatchEgg(
-      useProvider(),
       tokenId,
     );
   };
 
   const handleFeedChicken = async () => {
     await feedChicken(
-      useProvider(),
       tokenId,
       itemAmount,
     );
@@ -190,14 +185,12 @@ const Gameplay = () => {
 
   const handleWaterChicken = async () => {
     await waterChicken(
-      useProvider(),
       tokenId, 
       itemAmount);
   };
 
   const handleMedicateChicken = async () => {
     await medicateChicken(      
-      useProvider(),
       tokenId, 
       itemAmount
       );
@@ -205,7 +198,6 @@ const Gameplay = () => {
 
   const handleGetChickenDetails = async () => {
     const details = await getChickenDetails(
-      useProvider(),
       tokenId,
     );
     console.log('details', details);
@@ -218,7 +210,6 @@ const Gameplay = () => {
 
   const handleApproveSomeCoq = async () => {
     await approveSomeCoq(
-      useProvider(),
       Number(ethers.utils.parseEther(coqAmount)),
       );
   };

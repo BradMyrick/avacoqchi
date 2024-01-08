@@ -4,9 +4,9 @@ import { formatEther } from '@ethersproject/units'
 import type { Web3ReactHooks } from '@web3-react/core'
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
+import { COQ_ADDRESS } from '../constants'
 
 
-const COQ = '0x420FcA0121DC28039145009570975747295f2329'
 function useBalances(
   provider?: ReturnType<Web3ReactHooks['useProvider']>,
   accounts?: string[]
@@ -18,7 +18,7 @@ function useBalances(
       let stale = false
 
       // get balances from COQ contract
-      const contract = new ethers.Contract(COQ, ['function balanceOf(address) view returns (uint256)'], provider)
+      const contract = new ethers.Contract(COQ_ADDRESS, ['function balanceOf(address) view returns (uint256)'], provider)
       Promise.all(accounts.map((account) => contract.balanceOf(account))).then((balances) => {
         if (!stale) {
           setBalances(balances)

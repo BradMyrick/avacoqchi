@@ -14,7 +14,7 @@ const Inventory = () => {
 
   const getInventoryItems = async () => {
     if (!provider || !accounts) return;
-    const inventory = await getInventory(provider, accounts[0]);
+    const inventory = await getInventory(accounts[0]);
     setInventoryItems(inventory);
     setLoading(false);
   }
@@ -26,13 +26,7 @@ const Inventory = () => {
     <div className="flex flex-col items-center justify-center">
       <h1 className="text-4xl font-bold">Inventory</h1>
       <div className="flex flex-wrap justify-center">
-        {inventoryItems.map((item, index) => (
-          <ItemsCard
-            key={index}
-            name={item.name}
-            description={item.description}
-          />
-        ))}
+        {inventoryItems}
       </div>
     </div>
   );
