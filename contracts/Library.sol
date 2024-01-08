@@ -8,7 +8,9 @@ library ChickenLib {
         uint256 happiness;
         uint256 hunger;
         bool isHatched;
-        uint256 lastInteraction;
+        uint256 lastFed;
+        uint256 lastPlayed;
+        bool isAlive;
     }
     
 }
