@@ -92,20 +92,19 @@ contract Items is ERC1155, Ownable {
         itemPower[MEDICINE_DELUXE] = 75;
     }
 
-    // Function to use feed
-    function useFeed(uint256 itemId, uint256 amount) external onlyTokenOwner(token) {
+    // Function to use feed 
+    function useFeed(uint256 token, uint256 itemId, uint256 amount) external onlyTokenOwner(token) {
         require(itemId == FEED_BASIC || itemId == FEED_PREMIUM || itemId == FEED_DELUXE, "Invalid item");
         require(amount > 0, "Amount must be greater than 0");
         require(balanceOf(msg.sender, itemId) >= amount, "Not enough items");
         _burn(msg.sender, itemId, amount);
         // Update chicken stats
-        uint256 power = 
         COQCHI_CONTRACT.updateChickenHunger(token, itemPower[itemId]);
         emit ItemUsed(msg.sender, itemId, amount);
     }
 
     // Function to use water
-    function useWater(uint256 itemId, uint256 amount) external onlyTokenOwner(token) {
+    function useWater(uint256 token, uint256 itemId, uint256 amount) external onlyTokenOwner(token) {
         require(itemId == WATER_BASIC || itemId == WATER_PREMIUM || itemId == WATER_DELUXE, "Invalid item");
         require(amount > 0, "Amount must be greater than 0");
         require(balanceOf(msg.sender, itemId) >= amount, "Not enough items");
@@ -175,21 +174,15 @@ contract Items is ERC1155, Ownable {
         emit TokensWithdrawn(msg.sender, balance);
     }
 
+    // this is causing gas spend and I don't know why
     function getInventory(
         address user
-    ) external view returns (uint256[] memory, uint256[] memory) {
-        uint256[] memory ids = new uint256[](9);
-        uint256[] memory amounts = new uint256[](9);
+    ) external view returns (uint256[9] memory) {
+        uint256[9] memory inventory;
         for (uint256 i = 0; i < 9; i++) {
-            ids[i] = i;
-            amounts[i] = balanceOf(user, i);
+            inventory[i] = balanceOf(user, i);
         }
-        return (ids, amounts);
+        return inventory;
     }
-
-    // Gameplay mechanics
-
-    // instead of a gameplay contract, this contract will be the items and gameplay contract
-
 
 }

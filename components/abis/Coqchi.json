@@ -1,6 +1,17 @@
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_COQ",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_ITEMS",
+				"type": "address"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
@@ -228,7 +239,13 @@
 			{
 				"indexed": false,
 				"internalType": "uint256",
-				"name": "lastInteraction",
+				"name": "lastFed",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "lastPlayed",
 				"type": "uint256"
 			}
 		],
@@ -310,6 +327,25 @@
 			{
 				"indexed": true,
 				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "amount",
+				"type": "uint256"
+			}
+		],
+		"name": "TokensWithdrawn",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
 				"name": "from",
 				"type": "address"
 			},
@@ -328,6 +364,45 @@
 		],
 		"name": "Transfer",
 		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "COQ_INU_CONTRACT",
+		"outputs": [
+			{
+				"internalType": "contract ERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "ITEMS_CONTRACT",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "PlayWihCoq",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [
@@ -403,37 +478,41 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "lastInteraction",
+				"name": "lastFed",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lastPlayed",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isAlive",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "deadChicken",
-		"outputs": [],
-		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "gameplayContract",
+		"name": "eggPrice",
 		"outputs": [
 			{
-				"internalType": "address",
+				"internalType": "uint256",
 				"name": "",
-				"type": "address"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "gameplayUpdate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -494,8 +573,18 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "lastInteraction",
+						"name": "lastFed",
 						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "lastPlayed",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "isAlive",
+						"type": "bool"
 					}
 				],
 				"internalType": "struct ChickenLib.Chicken",
@@ -686,11 +775,24 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_gameplayContract",
+				"name": "_COQ",
 				"type": "address"
 			}
 		],
-		"name": "setGameplayContract",
+		"name": "setCoqContract",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_eggPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "setEggPrice",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -791,24 +893,6 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "happiness",
-				"type": "uint256"
-			}
-		],
-		"name": "updateChickenHappiness",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
 				"name": "health",
 				"type": "uint256"
 			}
@@ -837,19 +921,8 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "lastInteraction",
-				"type": "uint256"
-			}
-		],
-		"name": "updateChickenLastInteraction",
+		"inputs": [],
+		"name": "withdraw",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

@@ -1,6 +1,17 @@
 [
 	{
-		"inputs": [],
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_COQ",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_COQCHI",
+				"type": "address"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
@@ -355,6 +366,19 @@
 	},
 	{
 		"inputs": [],
+		"name": "COQCHI_CONTRACT",
+		"outputs": [
+			{
+				"internalType": "contract CoqChi",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "COQ_INU_CONTRACT",
 		"outputs": [
 			{
@@ -532,23 +556,37 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "chicken",
+		"outputs": [
 			{
-				"internalType": "address",
-				"name": "user",
-				"type": "address"
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
 			},
 			{
 				"internalType": "uint256",
-				"name": "itemId",
+				"name": "health",
 				"type": "uint256"
-			}
-		],
-		"name": "balanceOfItem",
-		"outputs": [
+			},
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "happiness",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "hunger",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isHatched",
+				"type": "bool"
+			},
+			{
+				"internalType": "uint256",
+				"name": "lastInteraction",
 				"type": "uint256"
 			}
 		],
@@ -662,6 +700,25 @@
 				"type": "uint256"
 			}
 		],
+		"name": "itemPower",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
 		"name": "itemPrices",
 		"outputs": [
 			{
@@ -676,11 +733,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			},
-			{
 				"internalType": "uint256",
 				"name": "itemId",
 				"type": "uint256"
@@ -691,7 +743,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "mint",
+		"name": "mintItem",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -811,6 +863,11 @@
 				"internalType": "uint256",
 				"name": "price",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "power",
+				"type": "uint256"
 			}
 		],
 		"name": "setItemPrices",
@@ -901,6 +958,11 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "token",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "itemId",
 				"type": "uint256"
 			},
@@ -919,6 +981,11 @@
 		"inputs": [
 			{
 				"internalType": "uint256",
+				"name": "token",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
 				"name": "itemId",
 				"type": "uint256"
 			},
@@ -935,6 +1002,11 @@
 	},
 	{
 		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "token",
+				"type": "uint256"
+			},
 			{
 				"internalType": "uint256",
 				"name": "itemId",

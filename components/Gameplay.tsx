@@ -1,7 +1,7 @@
 // Gameplay.tsx
 import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
-import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails, approveAllCoq, approveSomeCoq } from './Interactions';
+import { mintEgg, hatchEgg, feedChicken, waterChicken, medicateChicken, getChickenDetails, approveAllCoq, approveSomeCoq, approveCoqchiSpend, approveItemSpend } from './Interactions';
  './images/coq/egg/1.png';
 import Image from 'next/image';
 // import images from constants
@@ -204,15 +204,13 @@ const Gameplay = () => {
     setChickenDetails(details);
   };
 
-  const handleApproveAllCoq = async () => {
-    await approveAllCoq();
+  const handleApproveCoqchi = async () => {
+    await approveCoqchiSpend();
   };
 
-  const handleApproveSomeCoq = async () => {
-    await approveSomeCoq(
-      Number(ethers.utils.parseEther(coqAmount)),
-      );
-  };
+  const handleApproveItem = async () => {
+    await approveItemSpend();
+  }
 
   // Render the gameplay UI here
   return (
@@ -253,17 +251,11 @@ const Gameplay = () => {
         <button onClick={handleWaterChicken}>Water Chicken</button>
         <button onClick={handleMedicateChicken}>Medicate Chicken</button>
         <button onClick={handleGetChickenDetails}>Get Chicken Details</button>
-        <button onClick={handleApproveAllCoq}>Approve All COQ</button>
-        <input
-          type="number"
-          placeholder="Amount of COQ"
-          value={coqAmount}
-          onChange={(e) => setCoqAmount(e.target.value)}
-        />
-        <button onClick={handleApproveSomeCoq}>Aprove Set Amount of COQ</button>
+        <button onClick={handleApproveCoqchi}>Approve Mint Spend</button>
+        <button onClick={handleApproveItem}>Approve Gameplay Spend</button>
       </div>
     </div>
   );
-};
+}
 
 export default Gameplay;

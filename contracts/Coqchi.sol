@@ -40,7 +40,8 @@ contract CoqChi is ERC721, Ownable {
     event EggHatched(address indexed owner, uint256 tokenId, string name);
     event ChickenStatusUpdated(address indexed owner, uint256 tokenId, uint256 health, uint256 happiness, uint256 lastFed, uint256 lastPlayed);
     event ChickenDead(address indexed owner, uint256 tokenId);
-
+    event TokensWithdrawn(address indexed owner, uint256 amount);
+    
     constructor(address _COQ, address _ITEMS)Ownable(msg.sender) ERC721("CoqChi", "CQC") {
         COQ_INU_CONTRACT = ERC20(_COQ);
         ITEMS_CONTRACT = _ITEMS;
@@ -56,6 +57,7 @@ contract CoqChi is ERC721, Ownable {
     }
 
     function mintEgg(string memory _name) external onlyApproved(eggPrice) {
+        COQ_INU_CONTRACT.transferFrom(msg.sender, address(this), eggPrice);
         _tokenId++;
         _mint(msg.sender, _tokenId);
         chickens[_tokenId] = ChickenLib.Chicken(_name, 100, 100, 100, false, block.timestamp, block.timestamp, true);
@@ -126,6 +128,12 @@ contract CoqChi is ERC721, Ownable {
                 }
             }
         }
+    }
+
+    function withdraw() external onlyOwner {
+        uint256 balance = COQ_INU_CONTRACT.balanceOf(address(this));
+        COQ_INU_CONTRACT.transfer(msg.sender, balance);
+        emit TokensWithdrawn(msg.sender, balance);
     }
 }
 
